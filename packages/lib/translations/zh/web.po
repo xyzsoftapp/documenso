@@ -16260,3 +16260,47 @@ msgstr ""
 #: packages/ui/primitives/signature-pad/signature-pad-upload.tsx
 msgid "Zoom out"
 msgstr ""
+
+#: apps/remix/app/utils/fields.ts
+msgid "Image"
+msgstr "图片"
+
+#: apps/remix/app/components/general/envelope-editor/envelope-editor-fields-page.tsx
+msgid "Image Settings"
+msgstr "图片设置"
+
+#: apps/remix/app/components/dialogs/sign-field-image-dialog.tsx
+msgid "Add Image"
+msgstr "添加图片"
+
+#: apps/remix/app/components/dialogs/sign-field-image-dialog.tsx
+msgid "Choose an image, such as your company stamp, or take a photo of it."
+msgstr "选择一张图片（例如公司印章），或直接拍照。"
+
+#: apps/remix/app/components/dialogs/sign-field-image-dialog.tsx
+msgid "Choose Image"
+msgstr "选择图片"
+
+#: apps/remix/app/components/dialogs/sign-field-image-dialog.tsx
+msgid "Make the paper around it clear"
+msgstr "去除印章周围的纸张背景"
+
+#: apps/remix/app/components/dialogs/sign-field-image-dialog.tsx
+msgid "Choose Another"
+msgstr "换一张"
+
+#: apps/remix/app/components/dialogs/sign-field-image-dialog.tsx
+msgid "This image is too large. Please choose a smaller image."
+msgstr "图片太大，请选择较小的图片。"
+
+#: apps/remix/app/components/dialogs/sign-field-image-dialog.tsx
+msgid "Please choose an image file."
+msgstr "请选择图片文件。"
+
+#: apps/remix/app/components/dialogs/sign-field-image-dialog.tsx
+msgid "This image could not be read. Please choose another image."
+msgstr "无法读取此图片，请换一张。"
+
+#: apps/remix/app/components/forms/editor/editor-field-image-form.tsx
+msgid "The recipient chooses or photographs an image, such as their company stamp, to place here."
+msgstr "收件人在此处选择或拍摄一张图片，例如其公司印章。"
