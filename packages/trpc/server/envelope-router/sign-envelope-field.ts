@@ -198,6 +198,19 @@ export const signEnvelopeFieldRoute = procedure
       }
     }
 
+    // An image field keeps its image as a signature does, so it is drawn on the page and sealed the same way
+    if (field.type === FieldType.IMAGE) {
+      if (fieldValue.type !== FieldType.IMAGE) {
+        throw new AppError(AppErrorCode.INVALID_REQUEST, {
+          message: `Field ${fieldId} is not an image field`,
+        });
+      }
+
+      signatureImageAsBase64 = fieldValue.value;
+    }
+
+    const storesImage = field.type === FieldType.SIGNATURE || field.type === FieldType.IMAGE;
+
     return await prisma.$transaction(async (tx) => {
       const updatedField = await tx.field.update({
         where: {
@@ -212,7 +225,7 @@ export const signEnvelopeFieldRoute = procedure
         },
       });
 
-      if (field.type === FieldType.SIGNATURE) {
+      if (storesImage) {
         const signature = await tx.signature.upsert({
           where: {
             fieldId: field.id,
@@ -254,7 +267,7 @@ export const signEnvelopeFieldRoute = procedure
             recipientRole: recipient.role,
             fieldId: updatedField.secondaryId,
             field: match(updatedField.type)
-              .with(FieldType.SIGNATURE, FieldType.FREE_SIGNATURE, (type) => ({
+              .with(FieldType.SIGNATURE, FieldType.FREE_SIGNATURE, FieldType.IMAGE, (type) => ({
                 type,
                 data: signatureImageAsBase64 || typedSignature || '',
               }))

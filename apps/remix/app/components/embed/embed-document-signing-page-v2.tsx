@@ -4,7 +4,7 @@ import { ZSignDocumentEmbedDataSchema } from '@documenso/lib/types/embed-documen
 import { mapSecondaryIdToDocumentId } from '@documenso/lib/utils/envelope';
 import { dynamicActivate } from '@documenso/lib/utils/i18n';
 import { useLingui } from '@lingui/react';
-import { EnvelopeType } from '@prisma/client';
+import { EnvelopeType, FieldType } from '@prisma/client';
 import { useEffect, useLayoutEffect, useState } from 'react';
 
 import { injectCss } from '~/utils/css-vars';
@@ -242,7 +242,9 @@ export const EmbedSignDocumentV2ClientPage = ({
 
   if (hasCompletedDocument) {
     const completedSignature =
-      recipient.fields.find((field) => field.signature)?.signature ?? recipientSignature ?? null;
+      recipient.fields.find((field) => field.signature && field.type !== FieldType.IMAGE)?.signature ??
+      recipientSignature ??
+      null;
 
     return (
       <EmbedDocumentCompleted

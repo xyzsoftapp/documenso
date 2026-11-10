@@ -3,7 +3,7 @@ import { validateDropdownField } from '@documenso/lib/advanced-fields-validation
 import { validateNumberField } from '@documenso/lib/advanced-fields-validation/validate-number';
 import { validateTextField } from '@documenso/lib/advanced-fields-validation/validate-text';
 import { DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/constants/date-formats';
-import { isBase64Image } from '@documenso/lib/constants/signatures';
+import { isBase64Image, isValidImageFieldValue } from '@documenso/lib/constants/signatures';
 import { DEFAULT_DOCUMENT_TIME_ZONE } from '@documenso/lib/constants/time-zones';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import type { TDocumentMeta } from '@documenso/lib/types/document-meta';
@@ -241,6 +241,27 @@ export const extractFieldInsertionValues = ({
       if (documentMeta.typedSignatureEnabled === false && !isBase64) {
         throw new AppError(AppErrorCode.INVALID_BODY, {
           message: 'Typed signatures are not allowed. Please draw your signature',
+        });
+      }
+
+      return {
+        customText: '',
+        inserted: true,
+      };
+    })
+    .with({ type: FieldType.IMAGE }, (fieldValue) => {
+      const { value } = fieldValue;
+
+      if (!value) {
+        return {
+          customText: '',
+          inserted: false,
+        };
+      }
+
+      if (!isValidImageFieldValue(value)) {
+        throw new AppError(AppErrorCode.INVALID_BODY, {
+          message: 'Image fields only accept a PNG image of up to 1.5 MB',
         });
       }
 

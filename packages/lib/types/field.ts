@@ -3,11 +3,13 @@ import { FieldType, Prisma } from '@prisma/client';
 import { z } from 'zod';
 
 import {
+  FIELD_IMAGE_META_DEFAULT_VALUES,
   FIELD_SIGNATURE_META_DEFAULT_VALUES,
   ZCheckboxFieldMeta,
   ZDateFieldMeta,
   ZDropdownFieldMeta,
   ZEmailFieldMeta,
+  ZImageFieldMeta,
   ZInitialsFieldMeta,
   ZNameFieldMeta,
   ZNumberFieldMeta,
@@ -176,6 +178,13 @@ export const ZFieldDropdownSchema = BaseFieldSchemaUsingNumbers.extend({
 
 export type TFieldDropdown = z.infer<typeof ZFieldDropdownSchema>;
 
+export const ZFieldImageSchema = BaseFieldSchemaUsingNumbers.extend({
+  type: z.literal(FieldType.IMAGE),
+  fieldMeta: ZImageFieldMeta.catch(FIELD_IMAGE_META_DEFAULT_VALUES),
+});
+
+export type TFieldImage = z.infer<typeof ZFieldImageSchema>;
+
 /**
  * The full field schema which will enforce all types and meta fields.
  */
@@ -190,6 +199,7 @@ export const ZFullFieldSchema = z.discriminatedUnion('type', [
   ZFieldRadioSchema,
   ZFieldCheckboxSchema,
   ZFieldDropdownSchema,
+  ZFieldImageSchema,
 ]);
 
 export type TFullFieldSchema = z.infer<typeof ZFullFieldSchema>;

@@ -11,6 +11,7 @@ import {
   DiscIcon,
   EyeOffIcon,
   HashIcon,
+  ImageIcon,
   LockIcon,
   MailIcon,
   TypeIcon,
@@ -50,6 +51,7 @@ const FIELD_TYPE_ICONS: Record<FieldType, ElementType> = {
   [FieldType.RADIO]: DiscIcon,
   [FieldType.CHECKBOX]: CheckSquareIcon,
   [FieldType.DROPDOWN]: ChevronDownIcon,
+  [FieldType.IMAGE]: ImageIcon,
 };
 
 /**
