@@ -16286,6 +16286,42 @@ msgid "Make the paper around it clear"
 msgstr "去除印章周围的纸张背景"
 
 #: apps/remix/app/components/dialogs/sign-field-image-dialog.tsx
+msgid "Drag to move the stamp into the outline, and zoom until it fills it."
+msgstr "拖动印章使其位于轮廓内，并缩放至填满轮廓。"
+
+#: apps/remix/app/components/dialogs/sign-field-image-dialog.tsx
+msgid "Take Photo"
+msgstr "拍照"
+
+#: apps/remix/app/components/dialogs/sign-field-image-dialog.tsx
+msgid "Crop area"
+msgstr "裁剪区域"
+
+#: apps/remix/app/components/dialogs/sign-field-image-dialog.tsx
+msgid "Zoom"
+msgstr "缩放"
+
+#: apps/remix/app/components/dialogs/sign-field-image-dialog.tsx
+msgid "Shape"
+msgstr "形状"
+
+#: apps/remix/app/components/dialogs/sign-field-image-dialog.tsx
+msgid "Round"
+msgstr "圆形"
+
+#: apps/remix/app/components/dialogs/sign-field-image-dialog.tsx
+msgid "Square"
+msgstr "方形"
+
+#: apps/remix/app/components/dialogs/sign-field-image-dialog.tsx
+msgid "Turn"
+msgstr "旋转"
+
+#: apps/remix/app/components/dialogs/sign-field-image-dialog.tsx
+msgid "On the page"
+msgstr "在文件上的效果"
+
+#: apps/remix/app/components/dialogs/sign-field-image-dialog.tsx
 msgid "Choose Another"
 msgstr "换一张"
 
