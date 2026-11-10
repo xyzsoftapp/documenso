@@ -67,7 +67,7 @@ export const ImageFieldDialog = ({ label, onClose }: ImageFieldDialogProps) => {
   const [isClearBackground, setIsClearBackground] = useState(true);
   const [camera, setCamera] = useState<MediaStream | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [size, setSize] = useState(300);
+  const [size, setSize] = useState(280);
 
   const $box = useRef<HTMLDivElement>(null);
   const $canvas = useRef<HTMLCanvasElement>(null);
@@ -91,6 +91,28 @@ export const ImageFieldDialog = ({ label, onClose }: ImageFieldDialogProps) => {
 
     return () => observer.disconnect();
   }, [source]);
+
+  // When the view's measured size differs from the one the crop was set up for, the picture keeps its place in the
+  // crop.
+  const sizeRef = useRef(size);
+
+  useEffect(() => {
+    const k = size / sizeRef.current;
+    sizeRef.current = size;
+
+    if (k !== 1) {
+      setFit((f) => f * k);
+      setView((v) => ({ ...v, scale: v.scale * k, x: v.x * k, y: v.y * k }));
+    }
+  }, [size]);
+
+  const closeSource = () => {
+    if (source && typeof ImageBitmap !== 'undefined' && source.bitmap instanceof ImageBitmap) {
+      source.bitmap.close();
+    }
+
+    setSource(null);
+  };
 
   const start = (s: Source) => {
     // The shorter side fills the crop to start with.
@@ -492,7 +514,7 @@ export const ImageFieldDialog = ({ label, onClose }: ImageFieldDialogProps) => {
                   variant="link"
                   className="h-auto p-0"
                   onClick={() => {
-                    setSource(null);
+                    closeSource();
                     setError(null);
                   }}
                 >
@@ -571,19 +593,62 @@ const clearPaper = (data: Uint8ClampedArray) => {
   }
 };
 
-const loadSource = async (file: Blob): Promise<Source> => {
-  const bitmap = await createImageBitmap(file, { imageOrientation: 'from-image' });
-  const k = Math.min(1, MAX_SOURCE / Math.max(bitmap.width, bitmap.height));
+/**
+ * Reads the picture, turned upright as the camera recorded it. Older Safari can't take the orientation option, or
+ * can't make a bitmap from a file at all, so it falls back to plain bitmaps and then an image element.
+ */
+const readImage = async (file: Blob): Promise<ImageBitmap | HTMLImageElement> => {
+  try {
+    return await createImageBitmap(file, { imageOrientation: 'from-image' });
+  } catch {
+    // Older browsers: below.
+  }
 
-  if (k === 1) {
-    return { bitmap, width: bitmap.width, height: bitmap.height };
+  try {
+    return await createImageBitmap(file);
+  } catch {
+    // Older browsers: below.
+  }
+
+  const url = URL.createObjectURL(file);
+
+  try {
+    const img = new Image();
+
+    await new Promise<void>((resolve, reject) => {
+      img.onload = () => resolve();
+      img.onerror = () => reject(new Error('Image could not be read'));
+      img.src = url;
+    });
+
+    if (!img.naturalWidth || !img.naturalHeight) {
+      throw new Error('Image could not be read');
+    }
+
+    return img;
+  } finally {
+    URL.revokeObjectURL(url);
+  }
+};
+
+const loadSource = async (file: Blob): Promise<Source> => {
+  const image = await readImage(file);
+  const width = image instanceof HTMLImageElement ? image.naturalWidth : image.width;
+  const height = image instanceof HTMLImageElement ? image.naturalHeight : image.height;
+  const k = Math.min(1, MAX_SOURCE / Math.max(width, height));
+
+  if (k === 1 && !(image instanceof HTMLImageElement)) {
+    return { bitmap: image, width, height };
   }
 
   const canvas = document.createElement('canvas');
-  canvas.width = Math.round(bitmap.width * k);
-  canvas.height = Math.round(bitmap.height * k);
-  canvas.getContext('2d')?.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
-  bitmap.close();
+  canvas.width = Math.round(width * k);
+  canvas.height = Math.round(height * k);
+  canvas.getContext('2d')?.drawImage(image, 0, 0, canvas.width, canvas.height);
+
+  if (!(image instanceof HTMLImageElement)) {
+    image.close();
+  }
 
   return { bitmap: canvas, width: canvas.width, height: canvas.height };
 };
