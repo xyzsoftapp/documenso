@@ -19,6 +19,7 @@ import pMap from 'p-map';
 import { match } from 'ts-pattern';
 import { z } from 'zod';
 
+import { isValidImageFieldValue } from '../../constants/signatures';
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { jobs } from '../../jobs/client';
 import { DOCUMENT_AUDIT_LOG_TYPE, RECIPIENT_DIFF_TYPE } from '../../types/document-audit-logs';
@@ -335,13 +336,18 @@ export const createDocumentFromDirectTemplate = async ({
 
       const { value, isBase64 } = signedFieldValue;
 
+      const isImageField = templateField.type === FieldType.IMAGE;
       const isSignatureField =
-        templateField.type === FieldType.SIGNATURE || templateField.type === FieldType.FREE_SIGNATURE;
+        templateField.type === FieldType.SIGNATURE || templateField.type === FieldType.FREE_SIGNATURE || isImageField;
+
+      if (isImageField && (!value || !isValidImageFieldValue(value))) {
+        throw new Error('Image fields only accept a PNG image of up to 1.5 MB');
+      }
 
       let customText = !isSignatureField ? value : '';
 
-      const signatureImageAsBase64 = isSignatureField && isBase64 ? value : undefined;
-      const typedSignature = isSignatureField && !isBase64 ? value : undefined;
+      const signatureImageAsBase64 = isSignatureField && (isBase64 || isImageField) ? value : undefined;
+      const typedSignature = isSignatureField && !isBase64 && !isImageField ? value : undefined;
 
       if (templateField.type === FieldType.DATE) {
         customText = DateTime.now().setZone(derivedDocumentMeta.timezone).toFormat(derivedDocumentMeta.dateFormat);
@@ -697,7 +703,7 @@ export const createDocumentFromDirectTemplate = async ({
             recipientRole: createdDirectRecipient.role,
             fieldId: field.secondaryId,
             field: match(field.type)
-              .with(FieldType.SIGNATURE, FieldType.FREE_SIGNATURE, (type) => ({
+              .with(FieldType.SIGNATURE, FieldType.FREE_SIGNATURE, FieldType.IMAGE, (type) => ({
                 type,
                 data: field.signature?.signatureImageAsBase64 || field.signature?.typedSignature || '',
               }))

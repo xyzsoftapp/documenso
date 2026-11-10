@@ -65,6 +65,7 @@ export const parseFieldTypeFromPlaceholder = (fieldTypeString: string): FieldTyp
     .with('RADIO', () => FieldType.RADIO)
     .with('CHECKBOX', () => FieldType.CHECKBOX)
     .with('DROPDOWN', () => FieldType.DROPDOWN)
+    .with('IMAGE', () => FieldType.IMAGE)
     .otherwise(() => {
       throw new AppError(AppErrorCode.INVALID_BODY, {
         message: `Invalid field type: ${fieldTypeString}`,

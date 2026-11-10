@@ -18,6 +18,7 @@ import {
   ContactIcon,
   DiscIcon,
   HashIcon,
+  ImageIcon,
   ListIcon,
   MailIcon,
   TextIcon,
@@ -82,6 +83,11 @@ export const fieldButtonList = [
     type: FieldType.DROPDOWN,
     icon: ListIcon,
     name: msg`Dropdown`,
+  },
+  {
+    type: FieldType.IMAGE,
+    icon: ImageIcon,
+    name: msg`Image`,
   },
 ];
 

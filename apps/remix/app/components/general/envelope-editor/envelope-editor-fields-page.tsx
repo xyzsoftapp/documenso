@@ -12,6 +12,7 @@ import {
   type TDropdownFieldMeta,
   type TEmailFieldMeta,
   type TFieldMetaSchema,
+  type TImageFieldMeta,
   type TInitialsFieldMeta,
   type TNameFieldMeta,
   type TNumberFieldMeta,
@@ -58,6 +59,7 @@ import { EditorFieldCheckboxForm } from '~/components/forms/editor/editor-field-
 import { EditorFieldDateForm } from '~/components/forms/editor/editor-field-date-form';
 import { EditorFieldDropdownForm } from '~/components/forms/editor/editor-field-dropdown-form';
 import { EditorFieldEmailForm } from '~/components/forms/editor/editor-field-email-form';
+import { EditorFieldImageForm } from '~/components/forms/editor/editor-field-image-form';
 import { EditorFieldInitialsForm } from '~/components/forms/editor/editor-field-initials-form';
 import { EditorFieldNameForm } from '~/components/forms/editor/editor-field-name-form';
 import { EditorFieldNumberForm } from '~/components/forms/editor/editor-field-number-form';
@@ -87,6 +89,7 @@ const FieldSettingsTypeTranslations: Record<FieldType, MessageDescriptor> = {
   [FieldType.RADIO]: msg`Radio Settings`,
   [FieldType.CHECKBOX]: msg`Checkbox Settings`,
   [FieldType.DROPDOWN]: msg`Dropdown Settings`,
+  [FieldType.IMAGE]: msg`Image Settings`,
 };
 
 const ContentSettingsTypeTranslations: Record<EnvelopeContentType, MessageDescriptor> = {
@@ -599,6 +602,12 @@ export const EnvelopeEditorFieldsPage = () => {
                             .with(FieldType.TEXT, () => (
                               <EditorFieldTextForm
                                 value={selectedField?.fieldMeta as TTextFieldMeta | undefined}
+                                onValueChange={(value) => updateSelectedFieldMeta(value)}
+                              />
+                            ))
+                            .with(FieldType.IMAGE, () => (
+                              <EditorFieldImageForm
+                                value={selectedField?.fieldMeta as TImageFieldMeta | undefined}
                                 onValueChange={(value) => updateSelectedFieldMeta(value)}
                               />
                             ))

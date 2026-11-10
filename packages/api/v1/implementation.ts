@@ -32,6 +32,7 @@ import {
   ZCheckboxFieldMeta,
   ZDropdownFieldMeta,
   ZFieldMetaSchema,
+  ZImageFieldMeta,
   ZNumberFieldMeta,
   ZRadioFieldMeta,
   ZTextFieldMeta,
@@ -1402,6 +1403,9 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
               .with('DROPDOWN', () => ZDropdownFieldMeta.safeParse(fieldMeta))
               .with('NUMBER', () => ZNumberFieldMeta.safeParse(fieldMeta))
               .with('TEXT', () => ZTextFieldMeta.safeParse(fieldMeta))
+              .with('IMAGE', () =>
+                fieldMeta ? ZImageFieldMeta.safeParse(fieldMeta) : { success: true, data: undefined },
+              )
               .with('SIGNATURE', 'INITIALS', 'DATE', 'EMAIL', 'NAME', () => ({
                 success: true,
                 data: undefined,

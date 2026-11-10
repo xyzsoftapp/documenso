@@ -119,7 +119,8 @@ export const legacy_insertFieldInPDF = async (pdf: PDFDocument, field: FieldWith
   await match(field)
     .with(
       {
-        type: P.union(FieldType.SIGNATURE, FieldType.FREE_SIGNATURE),
+        // An image field carries its image as a drawn signature does
+        type: P.union(FieldType.SIGNATURE, FieldType.FREE_SIGNATURE, FieldType.IMAGE),
       },
       async (field) => {
         if (field.signature?.signatureImageAsBase64) {

@@ -12,6 +12,7 @@ import { match } from 'ts-pattern';
 
 import { AUTO_SIGNABLE_FIELD_TYPES } from '../../constants/autosign';
 import { DEFAULT_DOCUMENT_DATE_FORMAT } from '../../constants/date-formats';
+import { isValidImageFieldValue } from '../../constants/signatures';
 import { DEFAULT_DOCUMENT_TIME_ZONE } from '../../constants/time-zones';
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '../../types/document-audit-logs';
@@ -192,10 +193,16 @@ export const signFieldWithToken = async ({
   });
 
   const isSignatureField = field.type === FieldType.SIGNATURE || field.type === FieldType.FREE_SIGNATURE;
+  const isImageField = field.type === FieldType.IMAGE;
 
-  let customText = !isSignatureField ? value : undefined;
+  // An image field keeps its image as a signature does, so it is drawn on the page and sealed the same way
+  if (isImageField && !isValidImageFieldValue(value)) {
+    throw new Error('Image fields only accept a PNG image of up to 1.5 MB');
+  }
 
-  const signatureImageAsBase64 = isSignatureField && isBase64 ? value : undefined;
+  let customText = !isSignatureField && !isImageField ? value : undefined;
+
+  const signatureImageAsBase64 = (isSignatureField && isBase64) || isImageField ? value : undefined;
   const typedSignature = isSignatureField && !isBase64 ? value : undefined;
 
   if (field.type === FieldType.DATE) {
@@ -248,7 +255,7 @@ export const signFieldWithToken = async ({
       },
     });
 
-    if (isSignatureField) {
+    if (isSignatureField || isImageField) {
       const signature = await tx.signature.upsert({
         where: {
           fieldId: field.id,
@@ -290,7 +297,7 @@ export const signFieldWithToken = async ({
           recipientRole: recipient.role,
           fieldId: updatedField.secondaryId,
           field: match(updatedField.type)
-            .with(FieldType.SIGNATURE, FieldType.FREE_SIGNATURE, (type) => ({
+            .with(FieldType.SIGNATURE, FieldType.FREE_SIGNATURE, FieldType.IMAGE, (type) => ({
               type,
               data: signatureImageAsBase64 || typedSignature || '',
             }))
