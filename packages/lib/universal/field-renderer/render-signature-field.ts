@@ -3,9 +3,14 @@ import Konva from 'konva';
 import { DEFAULT_SIGNATURE_TEXT_FONT_SIZE, getSignatureFontFamily } from '../../constants/pdf';
 import { AppError } from '../../errors/app-error';
 import type { TSignatureFieldMeta } from '../../types/field-meta';
-import { resolveFieldOverflowMode } from '../../types/field-meta';
+import { DEFAULT_FIELD_FONT_SIZE, resolveFieldOverflowMode } from '../../types/field-meta';
 import { calculateOverflowLayout } from './calculate-overflow-layout';
-import { createFieldHoverInteraction, upsertFieldGroup, upsertFieldRect } from './field-generic-items';
+import {
+  createFieldHoverInteraction,
+  konvaTextFontFamily,
+  upsertFieldGroup,
+  upsertFieldRect,
+} from './field-generic-items';
 import type { FieldToRender, RenderFieldElementOptions } from './field-renderer';
 import { calculateFieldPosition } from './field-renderer';
 
@@ -114,11 +119,19 @@ const createSignatureImage = (signatureImageAsBase64: string, fieldWidth: number
   });
 };
 
+/**
+ * The font a field's text is drawn in: a typed signature in a handwriting font, and an image field's label (such as
+ * "Company stamp") in the normal font, since it is never a signature.
+ */
+const getFieldFontFamily = (field: FieldToRender, text: string) =>
+  field.type === 'IMAGE' ? konvaTextFontFamily : getSignatureFontFamily(text);
+
 const createFieldSignature = (field: FieldToRender, options: RenderFieldElementOptions): FieldSignature => {
   const { pageWidth, pageHeight, mode = 'edit', translations } = options;
 
   const { fieldX, fieldY, fieldWidth, fieldHeight } = calculateFieldPosition(field, pageWidth, pageHeight);
-  const fontSize = field.fieldMeta?.fontSize || DEFAULT_SIGNATURE_TEXT_FONT_SIZE;
+  const fontSize =
+    field.fieldMeta?.fontSize || (field.type === 'IMAGE' ? DEFAULT_FIELD_FONT_SIZE : DEFAULT_SIGNATURE_TEXT_FONT_SIZE);
 
   const fieldText = new Konva.Text({
     id: `${field.renderId}-text`,
@@ -126,7 +139,7 @@ const createFieldSignature = (field: FieldToRender, options: RenderFieldElementO
     listening: false,
   });
 
-  const fieldTypeName = translations?.[field.type] || field.type;
+  const fieldTypeName = (field.type === 'IMAGE' && field.fieldMeta?.label) || translations?.[field.type] || field.type;
 
   // Calculate text positioning based on alignment
   const textX = 0;
@@ -187,7 +200,7 @@ const createFieldSignature = (field: FieldToRender, options: RenderFieldElementO
     isLabel,
     textToRender,
     fontSize,
-    fontFamily: getSignatureFontFamily(textToRender),
+    fontFamily: getFieldFontFamily(field, textToRender),
     lineHeight: 1,
     letterSpacing: 0,
     textAlign: 'center',
@@ -209,7 +222,7 @@ const createFieldSignature = (field: FieldToRender, options: RenderFieldElementO
     wrap: overflowLayout.wrap,
     text: textToRender,
     fontSize,
-    fontFamily: getSignatureFontFamily(textToRender),
+    fontFamily: getFieldFontFamily(field, textToRender),
     align: overflowLayout.textAlign,
     width: overflowLayout.width,
     height: overflowLayout.height,
@@ -280,7 +293,7 @@ export const renderSignatureFieldElement = (field: FieldToRender, options: Rende
         isLabel,
         textToRender: fieldSignature.text(),
         fontSize: fieldSignature.fontSize(),
-        fontFamily: getSignatureFontFamily(fieldSignature.text()),
+        fontFamily: getFieldFontFamily(field, fieldSignature.text()),
         lineHeight: 1,
         letterSpacing: 0,
         textAlign: 'center',

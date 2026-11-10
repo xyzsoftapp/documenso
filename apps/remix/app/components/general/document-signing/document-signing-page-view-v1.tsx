@@ -35,6 +35,7 @@ import { DocumentSigningDateField } from '~/components/general/document-signing/
 import { DocumentSigningDropdownField } from '~/components/general/document-signing/document-signing-dropdown-field';
 import { DocumentSigningEmailField } from '~/components/general/document-signing/document-signing-email-field';
 import { DocumentSigningForm } from '~/components/general/document-signing/document-signing-form';
+import { DocumentSigningImageField } from '~/components/general/document-signing/document-signing-image-field';
 import { DocumentSigningInitialsField } from '~/components/general/document-signing/document-signing-initials-field';
 import { DocumentSigningNameField } from '~/components/general/document-signing/document-signing-name-field';
 import { DocumentSigningNumberField } from '~/components/general/document-signing/document-signing-number-field';
@@ -426,6 +427,7 @@ export const DocumentSigningPageViewV1 = ({
                   };
                   return <DocumentSigningDropdownField key={field.id} field={fieldWithMeta} />;
                 })
+                .with(FieldType.IMAGE, () => <DocumentSigningImageField key={field.id} field={field} />)
                 .otherwise(() => null),
             )}
         </ElementVisible>

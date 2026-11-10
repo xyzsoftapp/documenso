@@ -5,7 +5,7 @@ import EnvelopeSchema from '@documenso/prisma/generated/zod/modelSchema/Envelope
 import SignatureSchema from '@documenso/prisma/generated/zod/modelSchema/SignatureSchema';
 import TeamSchema from '@documenso/prisma/generated/zod/modelSchema/TeamSchema';
 import UserSchema from '@documenso/prisma/generated/zod/modelSchema/UserSchema';
-import { DocumentSigningOrder, DocumentStatus, EnvelopeType, SigningStatus } from '@prisma/client';
+import { DocumentSigningOrder, DocumentStatus, EnvelopeType, FieldType, SigningStatus } from '@prisma/client';
 import { z } from 'zod';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
@@ -255,6 +255,10 @@ export const getEnvelopeForRecipientSigning = async ({
       field: {
         recipientId: recipient.id,
         envelopeId: envelope.id,
+        // An image field, such as a stamp, keeps its image here too, but it is not the recipient's signature
+        type: {
+          not: FieldType.IMAGE,
+        },
       },
     },
     select: {

@@ -56,7 +56,8 @@ export const renderField = ({
     fieldCanvasStyle: resolveFieldCanvasStyle(field, mode, fieldCanvasStyleCache),
   };
 
-  // If the generic text field element array changes, update the `GenericTextFieldTypeMetas` type
+  // If the generic text field element array changes, update the `GenericTextFieldTypeMetas` type.
+  // An image field shows its label until an image is inserted, then the image, as a drawn signature does.
   return match(field.type)
     .with(FieldType.INITIALS, FieldType.NAME, FieldType.EMAIL, FieldType.DATE, FieldType.TEXT, FieldType.NUMBER, () =>
       renderGenericTextFieldElement(field, options),
@@ -64,7 +65,7 @@ export const renderField = ({
     .with(FieldType.CHECKBOX, () => renderCheckboxFieldElement(field, options))
     .with(FieldType.RADIO, () => renderRadioFieldElement(field, options))
     .with(FieldType.DROPDOWN, () => renderDropdownFieldElement(field, options))
-    .with(FieldType.SIGNATURE, () => renderSignatureFieldElement(field, options))
+    .with(FieldType.SIGNATURE, FieldType.IMAGE, () => renderSignatureFieldElement(field, options))
     .with(FieldType.FREE_SIGNATURE, () => {
       throw new Error('Free signature fields are not supported');
     })

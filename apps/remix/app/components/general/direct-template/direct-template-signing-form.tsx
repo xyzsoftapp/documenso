@@ -42,6 +42,7 @@ import { DocumentSigningCompleteDialog } from '~/components/general/document-sig
 import { DocumentSigningDateField } from '~/components/general/document-signing/document-signing-date-field';
 import { DocumentSigningDropdownField } from '~/components/general/document-signing/document-signing-dropdown-field';
 import { DocumentSigningEmailField } from '~/components/general/document-signing/document-signing-email-field';
+import { DocumentSigningImageField } from '~/components/general/document-signing/document-signing-image-field';
 import { DocumentSigningInitialsField } from '~/components/general/document-signing/document-signing-initials-field';
 import { DocumentSigningNameField } from '~/components/general/document-signing/document-signing-name-field';
 import { DocumentSigningNumberField } from '~/components/general/document-signing/document-signing-number-field';
@@ -98,7 +99,7 @@ export const DirectTemplateSigningForm = ({
           signedValue: value,
         };
 
-        if (field.type === FieldType.SIGNATURE) {
+        if (field.type === FieldType.SIGNATURE || field.type === FieldType.IMAGE) {
           tempField.signature = {
             id: 1,
             created: new Date(),
@@ -334,6 +335,14 @@ export const DirectTemplateSigningForm = ({
                   />
                 );
               })
+              .with(FieldType.IMAGE, () => (
+                <DocumentSigningImageField
+                  key={field.id}
+                  field={field}
+                  onSignField={onSignField}
+                  onUnsignField={onUnsignField}
+                />
+              ))
               .with(FieldType.RADIO, () => {
                 const parsedFieldMeta = field.fieldMeta ? ZRadioFieldMeta.parse(field.fieldMeta) : null;
 

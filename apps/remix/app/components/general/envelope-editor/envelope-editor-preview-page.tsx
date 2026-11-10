@@ -195,6 +195,11 @@ export const EnvelopeEditorPreviewPage = () => {
               customText: '',
             };
           })
+          .with({ type: FieldType.IMAGE }, () => {
+            return {
+              customText: '',
+            };
+          })
           .exhaustive(),
       };
     });
